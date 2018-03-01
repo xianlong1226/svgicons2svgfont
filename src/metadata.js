@@ -26,7 +26,12 @@ function getMetadataService(options) {
     );
   }
 
-  return function getMetadataFromFile(file, cb) {
+  return function getMetadataFromFile(file, currentUnicode, cb) {
+    if (typeof currentUnicode === 'function') {
+      cb = currentUnicode;
+      currentUnicode = null;
+    }
+    
     var basename = path.basename(file);
     var metadata = {
       path: file,
@@ -53,7 +58,7 @@ function getMetadataService(options) {
       usedUnicodes = usedUnicodes.concat(metadata.unicode);
     } else {
       do {
-        metadata.unicode[0] = String.fromCodePoint(options.startUnicode++);
+        metadata.unicode[0] = currentUnicode != null ?  String.fromCodePoint(currentUnicode) : String.fromCodePoint(options.startUnicode++);
       } while(-1 !== usedUnicodes.indexOf(metadata.unicode[0]));
       usedUnicodes.push(metadata.unicode[0]);
       if(options.prependUnicode) {
